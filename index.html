@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Registro de Datos</title>
+</head>
+<body>
+    <h1>Registro de Datos por Internet</h1>
+    <input type="text" id="dato" placeholder="Escribe algo">
+    <button onclick="guardarDato()">Guardar</button>
+
+    <h2>Datos registrados:</h2>
+    <ul id="lista"></ul>
+
+    <script>
+        async function guardarDato() {
+            const valor = document.getElementById('dato').value;
+            if(!valor) return alert('Escribe algo primero');
+
+            const res = await fetch('/guardar', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({dato: valor})
+            });
+            const data = await res.json();
+            alert(data.mensaje);
+            cargarDatos();
+        }
+
+        async function cargarDatos() {
+            const res = await fetch('/datos');
+            const datos = await res.json();
+            const lista = document.getElementById('lista');
+            lista.innerHTML = '';
+            datos.forEach(d => {
+                const li = document.createElement('li');
+                li.textContent = `${d.dato} (fecha: ${new Date(d.fecha).toLocaleString()})`;
+                lista.appendChild(li);
+            });
+        }
+
+        cargarDatos();
+    </script>
+</body>
+</html>
